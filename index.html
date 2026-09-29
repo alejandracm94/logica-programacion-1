@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ordena tus 3 números</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --fondo: #eceeff;
+  --tinta: #26235a;
+  --suave: #5d5a8f;
+  --tarjeta: #ffffff;
+  --mayor: #ff8fb1;
+  --centro: #ffd24a;
+  --menor: #7fe0c3;
+  --boton: #4b3fd6;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --fondo: #1a1840; --tinta: #f1efff; --suave: #b5b2e6; --tarjeta: #2a2764; --boton: #8b80ff; }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px 16px;
+  background: var(--fondo); color: var(--tinta);
+  font-family: "Nunito", system-ui, sans-serif; line-height: 1.55;
+}
+.card {
+  width: 100%; max-width: 560px; background: var(--tarjeta);
+  border-radius: 28px; padding: 36px 28px; text-align: center;
+  box-shadow: 0 20px 50px rgba(75, 63, 214, .15);
+}
+h1 { font-family: "Fredoka", system-ui, sans-serif; font-weight: 600; font-size: clamp(1.9rem, 6vw, 2.5rem); margin: 0 0 8px; }
+h2 { font-family: "Fredoka", system-ui, sans-serif; font-weight: 500; font-size: 1.15rem; margin: 0 0 10px; }
+.intro { color: var(--suave); margin: 0 0 24px; max-width: 42ch; margin-inline: auto; }
+
+.btn {
+  font: 600 1.1rem "Fredoka", system-ui, sans-serif; color: #fff; background: var(--boton);
+  border: 0; border-radius: 999px; padding: 14px 32px; cursor: pointer;
+  transition: transform .15s ease;
+}
+.btn:hover { transform: scale(1.04); }
+.btn:focus-visible, .chip:focus-visible { outline: 3px solid var(--centro); outline-offset: 3px; }
+
+.ejemplos-titulo { color: var(--suave); font-size: .95rem; margin: 22px 0 8px; }
+.ejemplos { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.chip {
+  font: 600 .95rem "Nunito", sans-serif; color: var(--tinta); background: transparent;
+  border: 2px solid var(--suave); border-radius: 999px; padding: 6px 16px; cursor: pointer;
+}
+.chip:hover { background: var(--centro); border-color: var(--centro); color: #26235a; }
+
+.resultado { margin-top: 32px; padding-top: 28px; border-top: 2px dashed var(--suave); }
+.mensaje { font-family: "Fredoka", sans-serif; font-size: 1.15rem; margin: 0 0 18px; }
+.mensaje.error { color: #d6336c; }
+.mensaje.iguales { background: var(--centro); color: #26235a; border-radius: 16px; padding: 12px 16px; }
+.fila { margin-bottom: 22px; }
+
+.bolas { display: flex; gap: 14px; justify-content: center; }
+.bola {
+  min-width: 68px; height: 68px; padding: 0 12px; border-radius: 34px; display: grid; place-items: center;
+  font: 600 1.5rem "Fredoka", sans-serif; color: #26235a;
+  animation: sale .45s cubic-bezier(.3, 1.5, .5, 1) backwards;
+}
+.bola:nth-child(2) { animation-delay: .1s; }
+.bola:nth-child(3) { animation-delay: .2s; }
+.b-mayor { background: var(--mayor); }
+.b-centro { background: var(--centro); }
+.b-menor { background: var(--menor); }
+@keyframes sale { from { transform: scale(.3) translateY(20px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .bola { animation: none; } .btn { transition: none; } }
+
+.texto { color: var(--suave); margin: 10px 0 0; }
+.resumen { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: center; }
+.punto { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; }
+.p-mayor { background: var(--mayor); } .p-centro { background: var(--centro); } .p-menor { background: var(--menor); }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Ordena tus 3 números</h1>
+    <p class="intro">Escribe tres números y te muestro cuál es el mayor, el del centro y el menor.</p>
+
+    <button id="btn-empezar" class="btn">Elegir mis números</button>
+
+    <p class="ejemplos-titulo">O prueba con un ejemplo:</p>
+    <div class="ejemplos" id="ejemplos"></div>
+
+    <section id="resultado" class="resultado" hidden aria-live="polite">
+      <p id="mensaje" class="mensaje"></p>
+
+      <div class="fila">
+        <h2>De mayor a menor</h2>
+        <div class="bolas" id="desc"></div>
+        <p class="texto" id="desc-txt"></p>
+      </div>
+
+      <div class="fila">
+        <h2>De menor a mayor</h2>
+        <div class="bolas" id="asc"></div>
+        <p class="texto" id="asc-txt"></p>
+      </div>
+
+      <ul class="resumen">
+        <li><span class="punto p-mayor"></span>Mayor: <strong id="r-mayor"></strong></li>
+        <li><span class="punto p-centro"></span>Centro: <strong id="r-centro"></strong></li>
+        <li><span class="punto p-menor"></span>Menor: <strong id="r-menor"></strong></li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+// ---------- 1. Pedir y validar un número ----------
+// Devuelve un número, o null si la persona cancela.
+function pedirNumero(orden) {
+  while (true) {
+    const texto = prompt("Escribe el número " + orden + " de 3:");
+    if (texto === null) return null;                      // canceló
+
+    const limpio = texto.trim().replace(",", ".");        // acepta 2,5 y 2.5
+    const valor = Number(limpio);
+
+    if (limpio !== "" && Number.isFinite(valor)) return valor;
+    alert("Eso no es un número válido. Inténtalo de nuevo.");
+  }
+}
+
+// ---------- 2. Analizar los números ----------
+function analizar(a, b, c) {
+  // Mayor
+  let mayor = a;
+  if (b > mayor) mayor = b;
+  if (c > mayor) mayor = c;
+
+  // Menor
+  let menor = a;
+  if (b < menor) menor = b;
+  if (c < menor) menor = c;
+
+  // Centro: lo que sobra al quitar el mayor y el menor (funciona también con repetidos)
+  const centro = a + b + c - mayor - menor;
+
+  const iguales = a === b && b === c;
+  return { mayor, centro, menor, iguales };
+}
+
+// ---------- 3. Mostrar resultados ----------
+const $ = (id) => document.getElementById(id);
+
+function dibujarBolas(contenedor, numeros, claves) {
+  contenedor.innerHTML = "";
+  numeros.forEach((n, i) => {
+    const bola = document.createElement("div");
+    bola.className = "bola " + claves[i];
+    bola.textContent = n;
+    contenedor.appendChild(bola);
+  });
+}
+
+function mostrar(a, b, c) {
+  const { mayor, centro, menor, iguales } = analizar(a, b, c);
+  const descendente = [mayor, centro, menor];
+  const ascendente = [menor, centro, mayor];
+
+  $("resultado").hidden = false;
+  const msg = $("mensaje");
+  msg.className = "mensaje";
+  msg.textContent = iguales
+    ? "¡Los tres números son iguales!"
+    : "Tus números fueron: " + [a, b, c].join(", ");
+  if (iguales) msg.classList.add("iguales");
+
+  dibujarBolas($("desc"), descendente, ["b-mayor", "b-centro", "b-menor"]);
+  dibujarBolas($("asc"), ascendente, ["b-menor", "b-centro", "b-mayor"]);
+  $("desc-txt").textContent = descendente.join(", ") + ".";
+  $("asc-txt").textContent = ascendente.join(", ") + ".";
+  $("r-mayor").textContent = mayor;
+  $("r-centro").textContent = centro;
+  $("r-menor").textContent = menor;
+
+  // También por consola
+  console.log("Entradas:", a, b, c);
+  if (iguales) console.log("Los números son iguales.");
+  console.log("Mayor a menor:", descendente.join(", ") + ".");
+  console.log("Menor a mayor:", ascendente.join(", ") + ".");
+}
+
+// ---------- 4. Eventos ----------
+$("btn-empezar").addEventListener("click", () => {
+  const a = pedirNumero(1); if (a === null) return;
+  const b = pedirNumero(2); if (b === null) return;
+  const c = pedirNumero(3); if (c === null) return;
+  mostrar(a, b, c);
+});
+
+// Ejemplos para probar sin escribir nada
+[[4, 4, 2], [4, 2, 4], [2, 4, 4], [7, 7, 7], [1, 5, 3], [-2, 0, 2.5]].forEach((ej) => {
+  const chip = document.createElement("button");
+  chip.className = "chip";
+  chip.textContent = ej.join(", ");
+  chip.addEventListener("click", () => mostrar(...ej));
+  $("ejemplos").appendChild(chip);
+});
+  </script>
+</body>
+</html>
